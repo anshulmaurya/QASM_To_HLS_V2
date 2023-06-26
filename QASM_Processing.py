@@ -55,7 +55,7 @@ class QASMProcessing():
 
     def listProcessing(self):
         cirData: list[Any] = self.stringProcessing()
-        cirData.reverse()
+        # cirData.reverse()
         print(cirData)
         finalList = []
         # print(finalList)
