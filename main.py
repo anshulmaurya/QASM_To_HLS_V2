@@ -13,23 +13,23 @@ def init(cir, n):
 
 def oracle(cir, n):
     # 001
-    cir.x(0)
+    # cir.x(0)
     cir.x(1)
     cir.h(2)
     cir.mct([0, 1], 2)
     cir.h(2)
     cir.x(1)
-    cir.x(0)
+    # cir.x(0)
     # cir.barrier([0, 1, 2])
 
-    # 100
-    cir.x(0)
-    cir.x(1)
-    cir.h(2)
-    cir.mct([0, 1], 2)
-    cir.h(2)
-    cir.x(1)
-    cir.x(0)
+    # # 100
+    # cir.x(0)
+    # cir.x(1)
+    # cir.h(2)
+    # cir.mct([0, 1], 2)
+    # cir.h(2)
+    # cir.x(1)
+    # cir.x(0)
     # cir.barrier([0, 1, 2])
     return cir
 
@@ -79,7 +79,7 @@ from QASM_Processing import QASMProcessing
 qasm = QASMProcessing(gc)
 cirData = qasm.stringProcessing()
 # cirData = qasm.listProcess
-cirData = qasm.listProcessing()
+cirData = qasm.qasmToList()
 
 print(cirData, len(cirData))
 

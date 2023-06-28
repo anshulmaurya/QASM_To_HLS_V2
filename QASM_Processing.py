@@ -5,7 +5,7 @@ from typing import List, Any
 import qiskit
 
 
-class QASMProcessing():
+class QASMProcessing:
     def __init__(self, quantumCircuit):
         if "qiskit.circuit." in str(type(quantumCircuit)):
             qASM = quantumCircuit.qasm()
@@ -53,7 +53,7 @@ class QASMProcessing():
             # print(gate, gatePos)
         return self.circuitData
 
-    def listProcessing(self):
+    def qasmToList(self):
         cirData: list[Any] = self.stringProcessing()
         # cirData.reverse()
         print(cirData)
@@ -78,7 +78,7 @@ class QASMProcessing():
                 else:
                     r = pos - n
                     if r < 0:
-                        r += self.numberOfQubits-1    # remove +1 in case of failure
+                        r += self.numberOfQubits    # remove -1 in case of failure
                     for ite in range(r):
                         finalList.append('I')
                         n += 1
@@ -89,7 +89,7 @@ class QASMProcessing():
         self.circuitData = finalList
         return self.circuitData
 
-    #
+
     # @property
     # def listProcess(self):
     #     cirData: list[Any] = self.stringProcessing()
