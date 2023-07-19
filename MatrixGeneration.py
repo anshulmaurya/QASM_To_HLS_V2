@@ -17,5 +17,6 @@ class CircuitListToMatrix:
             pair = self.cirList[n:n+3]
             print(pair, "  ")
 
+            # test
 
         return cirMat
