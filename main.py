@@ -1,7 +1,5 @@
 from qiskit import IBMQ, Aer, assemble, transpile
 from qiskit import QuantumCircuit
-from qiskit_aer import AerSimulator
-from qiskit.visualization import plot_histogram
 
 
 def init(cir, n):
@@ -51,23 +49,28 @@ def diffuser(cir, n):
     return cir
 
 
-def simulator(QC, qNum=None, numshots=10000):
-    if qNum:
-        QC.measure(qNum, 0)
-    else:
-        QC.measure_all()
-    aer_sim = Aer.get_backend('aer_simulator', device='CPU')
-    transpiled = transpile(QC, aer_sim)
-    qobj = assemble(transpiled)
-    results = aer_sim.run(qobj, shots=numshots).result()
-    counts = results.get_counts()
-    return counts
+# def simulator(QC, qNum=None, numshots=10000):
+#     if qNum:
+#         QC.measure(qNum, 0)
+#     else:
+#         QC.measure_all()
+#     aer_sim = Aer.get_backend('aer_simulator', device='CPU')
+#     transpiled = transpile(QC, aer_sim)
+#     qobj = assemble(transpiled)
+#     results = aer_sim.run(qobj, shots=numshots).result()
+#     counts = results.get_counts()
+#     return counts
 
 
 gc = QuantumCircuit(3)
-gc = init(gc, 3)
-gc = oracle(gc, 3)
-gc = diffuser(gc, 3)
+gc.h(0)
+gc.h(2)
+gc.x(2)
+gc.x(1)
+
+# gc = init(gc, 3)
+# gc = oracle(gc, 3)
+# gc = diffuser(gc, 3)
 print(gc)
 # gc.draw()
 # counts = simulator(gc)
@@ -75,15 +78,15 @@ print(gc)
 
 
 from QASM_Processing import QASMProcessing
+from MatrixGeneration import CircuitListToMatrix
 
 qasm = QASMProcessing(gc)
-cirData = qasm.stringProcessing()
-# cirData = qasm.listProcess
+# # cirData = qasm.stringProcessing()
+# # cirData = qasm.listProcess
 cirData = qasm.qasmToList()
 
-print(cirData, len(cirData))
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)
+matrix = cirMat.genMat
 
-if len(cirData) % 3 == 0:
-    print("True")
-else:
-    print("False")
+print(cirData, len(cirData))
+print(matrix)

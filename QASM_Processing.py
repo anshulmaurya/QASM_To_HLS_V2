@@ -1,9 +1,8 @@
 # this file takes the qiskit circuit object and processes the QASM and
 # provides circuit data in a list of tuples; (gateType, Pos)
 from typing import List, Any
-
-import qiskit
-
+from qiskit import QuantumCircuit
+import math as m
 
 class QASMProcessing:
     def __init__(self, quantumCircuit):
@@ -86,9 +85,17 @@ class QASMProcessing:
                     n += 1
                     continue
         # print(finalList)
+
+        if len(finalList) % self.numberOfQubits != 0:
+            itr = (m.ceil(len(finalList)/self.numberOfQubits)*self.numberOfQubits) - len(finalList)
+            for _ in range(itr):
+                finalList.append('I')
         self.circuitData = finalList
         return self.circuitData
 
+    @property
+    def cirQubits(self):
+        return self.numberOfQubits
 
     # @property
     # def listProcess(self):
