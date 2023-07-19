@@ -62,11 +62,11 @@ def diffuser(cir, n):
 #     return counts
 
 
-gc = QuantumCircuit(3)
+gc = QuantumCircuit(2)
 gc.h(0)
-gc.h(2)
-gc.x(2)
-gc.x(1)
+# gc.h(2)
+# gc.x(2)
+gc.x(0)
 
 # gc = init(gc, 3)
 # gc = oracle(gc, 3)
@@ -84,9 +84,9 @@ qasm = QASMProcessing(gc)
 # # cirData = qasm.stringProcessing()
 # # cirData = qasm.listProcess
 cirData = qasm.qasmToList()
+print(cirData, len(cirData))
 
 cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)
 matrix = cirMat.genMat
 
-print(cirData, len(cirData))
 print(matrix)
