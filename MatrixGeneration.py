@@ -24,12 +24,35 @@ class CircuitListToMatrix:
         for index, x in enumerate(cnotDetail):
             if x == 'I':
                 cnotDetail.pop(index)
-
-        sqs = [''.join(s) for s in list(itertools.product(*[['0', '1']] * (self.number_of_qubit)))]
-
-        print('cnotdetail:', cnotDetail, sqs)
-
-        return []
+        ctrl = cnotDetail[:len(cnotDetail) - 1]
+        # ctrl.reverse()
+        target = cnotDetail[len(cnotDetail) - 1]
+        sqs = [''.join(s) for s in list(itertools.product(*[['0', '1']] * self.number_of_qubit))]
+        CNOT_LayerArray = np.zeros((2 ** self.number_of_qubit, 2 ** self.number_of_qubit))
+        for i, binSeq in enumerate(sqs):
+            ctrlFlag = 0
+            for c in ctrl:
+                if binSeq[c] == '1':
+                    ctrlFlag = 1
+                else:
+                    ctrlFlag = 0
+                    break
+            if ctrlFlag == 1:
+                s = ''
+                if binSeq[target] == '1':
+                    for pos, ch in enumerate(binSeq):
+                        if pos == target:
+                            ch = '0'
+                        s = s + ch
+                else:
+                    for pos, ch in enumerate(binSeq):
+                        if pos == target:
+                            ch = '1'
+                        s = s + ch
+                r = sqs.index(s)
+                CNOT_LayerArray[r][i] = 1
+        # print('cnotdetail:', CNOT_LayerArray)
+        return CNOT_LayerArray
 
     @property
     def genMat(self):
@@ -46,19 +69,34 @@ class CircuitListToMatrix:
                     pair.append('I')
             else:
                 pair.append(self.cirList[num])
+                try:
+                    if 'cx' in self.cirList[num + 1] or 'ccx' in self.cirList[num + 1]:
+                        while len(pair) != self.number_of_qubit:
+                            pair.append('I')
+                except:
+                    pass
+
             if len(pair) == self.number_of_qubit:
-                print(pair, "  ")
+                print(f"\nPAIR {num}:", pair, "  ")
                 if cnotFlag == 1:
                     cnotFlag = 0
-                    # layerMat = self.cnotLayerMat(pair)
-                    self.cnotLayerMat(pair)
-                    pass
+                    layerMat = np.matrix(self.cnotLayerMat(pair))
+                    # self.cnotLayerMat(pair)
+                    # pass
                 else:
                     for pos, g in enumerate(pair):
                         if pos == 0:
                             layerMat = self.toGateMatrix(g)
                             continue
                         layerMat = np.kron(self.toGateMatrix(g), layerMat)
-                cirMat = np.matmul(cirMat, layerMat)
+                check = self.is_unitary(layerMat)
+                print("Is Unitary: ", check)
+                print(layerMat)
+                cirMat = np.matmul(layerMat, cirMat)
                 pair = []
         return cirMat
+
+    def is_unitary(self, m):
+        # m = np.around(m, 1)
+        return np.allclose(np.eye(m.shape[0]), np.around(m.H * m, 1))
+

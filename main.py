@@ -62,14 +62,12 @@ def diffuser(cir, n):
 
 
 gc = QuantumCircuit(3)
-# gc.x(2)
-# gc.x(0)
-# gc.h(0)
-# gc.h(2)
+gc.h(0)
+gc.ccx(control_qubit1= 0, control_qubit2=1, target_qubit=2)
 
-gc = init(gc, 3)
-gc = oracle(gc, 3)
-gc = diffuser(gc, 3)
+# gc = init(gc, 3)
+# gc = oracle(gc, 3)
+# gc = diffuser(gc, 3)
 print(gc)
 # gc.draw()
 # counts = simulator(gc)
@@ -97,3 +95,8 @@ ipVec = np.zeros(2 ** 3)
 ipVec[0] = 1
 
 print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
+
+m = np.matrix(('1 1;'
+               '1 -1'))
+
+print("in main: ", cirMat.is_unitary(m))
