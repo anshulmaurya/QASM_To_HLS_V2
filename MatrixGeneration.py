@@ -21,9 +21,12 @@ class CircuitListToMatrix:
 
     def cnotLayerMat(self, cnotDetail):
         import itertools
-        for index, x in enumerate(cnotDetail):
-            if x == 'I':
-                cnotDetail.pop(index)
+        tempCnotDetail = []
+        for x in cnotDetail:
+            if x != 'I':
+                tempCnotDetail.append(x)
+        cnotDetail = tempCnotDetail
+        del(tempCnotDetail)
         ctrl = cnotDetail[:len(cnotDetail) - 1]
         # ctrl.reverse()
         target = cnotDetail[len(cnotDetail) - 1]
@@ -51,6 +54,8 @@ class CircuitListToMatrix:
                         s = s + ch
                 r = sqs.index(s)
                 CNOT_LayerArray[r][i] = 1
+            else:
+                CNOT_LayerArray[i][i] = 1
         # print('cnotdetail:', CNOT_LayerArray)
         return CNOT_LayerArray
 
@@ -88,12 +93,16 @@ class CircuitListToMatrix:
                         if pos == 0:
                             layerMat = self.toGateMatrix(g)
                             continue
-                        layerMat = np.kron(self.toGateMatrix(g), layerMat)
+                        layerMat = np.kron(layerMat, self.toGateMatrix(g))
                 check = self.is_unitary(layerMat)
                 print("Is Unitary: ", check)
                 print(layerMat)
-                cirMat = np.matmul(layerMat, cirMat)
+                cirMat = np.matmul(np.around(cirMat, 3), np.around(layerMat, 3))
                 pair = []
+
+        check = self.is_unitary(layerMat)
+        print("\nIs Unitary: ", check)
+        print("Final matrix for circuit: \n", cirMat)
         return cirMat
 
     def is_unitary(self, m):

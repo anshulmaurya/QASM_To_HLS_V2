@@ -13,7 +13,7 @@ def oracle(cir, n):
     # cir.x(0)
     cir.x(1)
     cir.h(2)
-    cir.mct([1], 2)
+    cir.mct([0, 1], 2)
     cir.h(2)
     cir.x(1)
     # cir.x(0)
@@ -61,9 +61,16 @@ def diffuser(cir, n):
 #     return counts
 
 
-gc = QuantumCircuit(3)
+gc = QuantumCircuit(4)
 gc.h(0)
-gc.ccx(control_qubit1= 0, control_qubit2=1, target_qubit=2)
+gc.h(1)
+gc.h(2)
+gc.cx([0, 1, 2], 3)
+# gc.ccx(control_qubit1= 0, control_qubit2=1, target_qubit=2)
+# gc.h(1)
+# gc.h(1)
+# gc.x(1)
+
 
 # gc = init(gc, 3)
 # gc = oracle(gc, 3)
@@ -91,12 +98,8 @@ matrix = cirMat.genMat
 
 import numpy as np
 
-ipVec = np.zeros(2 ** 3)
+ipVec = np.zeros(2 ** 4)
 ipVec[0] = 1
 
 print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
 
-m = np.matrix(('1 1;'
-               '1 -1'))
-
-print("in main: ", cirMat.is_unitary(m))
