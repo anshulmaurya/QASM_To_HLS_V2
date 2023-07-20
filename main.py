@@ -62,14 +62,14 @@ def diffuser(cir, n):
 
 
 gc = QuantumCircuit(3)
-gc.x(2)
-gc.x(0)
-gc.h(0)
-gc.h(2)
+# gc.x(2)
+# gc.x(0)
+# gc.h(0)
+# gc.h(2)
 
-# gc = init(gc, 3)
-# gc = oracle(gc, 3)
-# gc = diffuser(gc, 3)
+gc = init(gc, 3)
+gc = oracle(gc, 3)
+gc = diffuser(gc, 3)
 print(gc)
 # gc.draw()
 # counts = simulator(gc)
@@ -96,4 +96,4 @@ import numpy as np
 ipVec = np.zeros(2 ** 3)
 ipVec[0] = 1
 
-print(np.matmul(ipVec, matrix))
+print("\n\nfinal result:\n", np.matmul(ipVec, matrix))

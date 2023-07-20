@@ -94,6 +94,12 @@ class QASMProcessing:
             itr = (m.ceil(len(finalList) / self.numberOfQubits) * self.numberOfQubits) - len(finalList)
             for _ in range(itr):
                 finalList.append('I')
+
+        # for index, g in enumerate(finalList):
+        #     if 'cx' in g or 'ccx' in g:
+        #         for n in range(self.numberOfQubits):
+        #             if n in finalList[index][1]:
+        #
         self.circuitData = finalList
         return self.circuitData
 
