@@ -1,4 +1,3 @@
-from qiskit import IBMQ, Aer, assemble, transpile
 from qiskit import QuantumCircuit
 
 
@@ -14,7 +13,7 @@ def oracle(cir, n):
     # cir.x(0)
     cir.x(1)
     cir.h(2)
-    cir.mct([0, 1], 2)
+    cir.mct([1], 2)
     cir.h(2)
     cir.x(1)
     # cir.x(0)
@@ -62,11 +61,11 @@ def diffuser(cir, n):
 #     return counts
 
 
-gc = QuantumCircuit(2)
-gc.h(0)
-# gc.h(2)
-# gc.x(2)
+gc = QuantumCircuit(3)
+gc.x(2)
 gc.x(0)
+gc.h(0)
+gc.h(2)
 
 # gc = init(gc, 3)
 # gc = oracle(gc, 3)
@@ -89,4 +88,12 @@ print(cirData, len(cirData))
 cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)
 matrix = cirMat.genMat
 
-print(matrix)
+# print(matrix)
+
+
+import numpy as np
+
+ipVec = np.zeros(2 ** 3)
+ipVec[0] = 1
+
+print(np.matmul(ipVec, matrix))

@@ -4,6 +4,7 @@ from typing import List, Any
 from qiskit import QuantumCircuit
 import math as m
 
+
 class QASMProcessing:
     def __init__(self, quantumCircuit):
         if "qiskit.circuit." in str(type(quantumCircuit)):
@@ -31,7 +32,10 @@ class QASMProcessing:
             # code to extract gate type and1 position
             spcaeIndex = l.index(' ')
             gate = l[:spcaeIndex]
-            if gate == "ccx":
+            if gate == "ccx" or gate == "cx":
+                if gate == "cx":
+                    l = 'c' + l    # making cx gate as ccx (are same)
+                    print(l)
                 ccxGatePos = []
                 numStr = ''
                 flag = 0
@@ -77,7 +81,7 @@ class QASMProcessing:
                 else:
                     r = pos - n
                     if r < 0:
-                        r += self.numberOfQubits    # remove -1 in case of failure
+                        r += self.numberOfQubits  # remove -1 in case of failure
                     for ite in range(r):
                         finalList.append('I')
                         n += 1
@@ -87,7 +91,7 @@ class QASMProcessing:
         # print(finalList)
 
         if len(finalList) % self.numberOfQubits != 0:
-            itr = (m.ceil(len(finalList)/self.numberOfQubits)*self.numberOfQubits) - len(finalList)
+            itr = (m.ceil(len(finalList) / self.numberOfQubits) * self.numberOfQubits) - len(finalList)
             for _ in range(itr):
                 finalList.append('I')
         self.circuitData = finalList

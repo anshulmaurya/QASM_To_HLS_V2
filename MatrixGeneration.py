@@ -28,13 +28,12 @@ class CircuitListToMatrix:
         m = []
         for n in range(0, len(self.cirList), self.number_of_qubit):
             pair = self.cirList[n:n + self.number_of_qubit]
-            print(pair, "  ")
-            for pos, g in enumerate(pair):
-                if pos == 0:
-                    layerMat = self.toGateMatrix(g)
-                    continue
-                layerMat = np.kron(self.toGateMatrix(g), layerMat)
-
-            cirMat = np.matmul(cirMat, layerMat)
-
+            if len(pair) == self.number_of_qubit:
+                print(pair, "  ")
+                for pos, g in enumerate(pair):
+                    if pos == 0:
+                        layerMat = self.toGateMatrix(g)
+                        continue
+                    layerMat = np.kron(self.toGateMatrix(g), layerMat)
+                cirMat = np.matmul(cirMat, layerMat)
         return cirMat
