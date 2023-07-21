@@ -51,8 +51,9 @@ gc = QuantumCircuit(3)
 gc = init(gc, 3)
 gc = oracle(gc, 3)
 gc = diffuser(gc, 3)
+gc = oracle(gc, 3)
+gc = diffuser(gc, 3)
 print(gc)
-
 
 qasm = QASMProcessing(gc)
 cirData = qasm.qasmToList()
@@ -60,7 +61,6 @@ print(cirData, len(cirData))
 
 cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)
 matrix = cirMat.genMat
-
 
 
 
@@ -72,3 +72,9 @@ ipVec[0] = 1
 
 print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
 
+
+# #circuit already defined
+# backend = Aer.get_backend('unitary_simulator')
+# job = execute(gc, backend)
+# result = job.result()
+# print(result.get_unitary(gc, decimals=2))

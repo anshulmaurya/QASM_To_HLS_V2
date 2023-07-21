@@ -107,5 +107,5 @@ class CircuitListToMatrix:
 
     def is_unitary(self, m):
         # m = np.around(m, 1)
-        return np.allclose(np.eye(m.shape[0]), np.around(m.H * m, 1))
+        return np.allclose(np.eye(m.shape[0]), np.around(m.H * m, 2))
 
