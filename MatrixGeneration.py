@@ -2,11 +2,12 @@ import numpy as np
 
 
 class CircuitListToMatrix:
-    def __init__(self, cirList, number_of_qubit):
+    def __init__(self, cirList, number_of_qubit, check = False):
         if len(cirList) == 0:
             raise Exception("empty list cant find circuit data")
         self.cirList = cirList
         self.number_of_qubit = number_of_qubit
+        self.check = check
 
     def toGateMatrix(self, gateName):
         if gateName == 'h':
@@ -61,11 +62,13 @@ class CircuitListToMatrix:
 
     @property
     def genMat(self):
-        cirMat = np.identity(2 ** self.number_of_qubit)
+        if self.check:
+            cirMat = np.identity(2 ** self.number_of_qubit)
         # layerMat = np.matrix(self.toGateMatrix(self.cirList[0]))
         layerMat = np.matrix([])
         pair = []
         cnotFlag = 0
+        pairNum = 0
         for num in range(len(self.cirList)):
             if 'cx' in self.cirList[num] or 'ccx' in self.cirList[num]:
                 cnotFlag = 1
@@ -82,7 +85,8 @@ class CircuitListToMatrix:
                     pass
 
             if len(pair) == self.number_of_qubit:
-                print(f"\nPAIR {num}:", pair, "  ")
+                pairNum += 1
+                print(f"\nPAIR {pairNum}:", pair, "  ")
                 if cnotFlag == 1:
                     cnotFlag = 0
                     layerMat = np.matrix(self.cnotLayerMat(pair))
@@ -94,18 +98,24 @@ class CircuitListToMatrix:
                             layerMat = self.toGateMatrix(g)
                             continue
                         layerMat = np.kron(layerMat, self.toGateMatrix(g))
-                check = self.is_unitary(layerMat)
-                print("Is Unitary: ", check)
                 print(layerMat)
-                cirMat = np.matmul(np.around(cirMat, 3), np.around(layerMat, 3))
+
+                if self.check:
+                    check = self.is_unitary(layerMat)
+                    print("Is Unitary: ", check)
+                    print(layerMat)
+                    cirMat = np.matmul(np.around(cirMat, 3), np.around(layerMat, 3))
                 pair = []
+        if self.check:
+            check = self.is_unitary(layerMat)
+            print("\nIs Unitary: ", check)
+            print("Final matrix for circuit: \n", cirMat)
+            return cirMat
+        else:
+            return True
 
-        check = self.is_unitary(layerMat)
-        print("\nIs Unitary: ", check)
-        print("Final matrix for circuit: \n", cirMat)
-        return cirMat
-
-    def is_unitary(self, m):
+    @staticmethod
+    def is_unitary(m):
         # m = np.around(m, 1)
         return np.allclose(np.eye(m.shape[0]), np.around(m.H * m, 2))
 

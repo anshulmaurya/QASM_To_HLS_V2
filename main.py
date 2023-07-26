@@ -2,10 +2,11 @@ from qiskit import QuantumCircuit
 from QASM_Processing import QASMProcessing
 from MatrixGeneration import CircuitListToMatrix
 
+
 def init(cir, n):
     for p in range(n):
         cir.h(p)
-        # cir.barrier(p)
+        cir.barrier(p)
     return cir
 
 
@@ -31,6 +32,7 @@ def oracle(cir, n):
     # cir.barrier([0, 1, 2])
     return cir
 
+
 def diffuser(cir, n):
     for p in range(n):
         cir.h(p)
@@ -47,6 +49,7 @@ def diffuser(cir, n):
         cir.h(p)
     return cir
 
+
 gc = QuantumCircuit(3)
 gc = init(gc, 3)
 gc = oracle(gc, 3)
@@ -59,22 +62,33 @@ qasm = QASMProcessing(gc)
 cirData = qasm.qasmToList()
 print(cirData, len(cirData))
 
-cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)  # , check=True)
 matrix = cirMat.genMat
 
+print(matrix)
 
+## TESTING WITH KET 0
+# import numpy as np
+#
+# ipVec = np.zeros(2 ** 3)
+# ipVec[0] = 1
+#
+# print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
 
-# TESTING WITH KET 0
-import numpy as np
-
-ipVec = np.zeros(2 ** 3)
-ipVec[0] = 1
-
-print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
-
-
-# #circuit already defined
+# circuit already defined
+# from qiskit import*
+# from qiskit.circuit.random import random_circuit
+#
+# gc = random_circuit(2, 2)
 # backend = Aer.get_backend('unitary_simulator')
 # job = execute(gc, backend)
 # result = job.result()
+# matrix = result.get_unitary(gc, decimals=2)
 # print(result.get_unitary(gc, decimals=2))
+#
+# import numpy as np
+#
+# ipVec = np.zeros(2 ** 2)
+# ipVec[0] = 1
+#
+# print("\n\nfinal result:\n", np.matmul(ipVec, matrix))

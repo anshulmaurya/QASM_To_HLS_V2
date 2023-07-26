@@ -52,6 +52,9 @@ class QASMProcessing:
                 gatePos = ccxGatePos
             else:
                 gatePos = int(l[spcaeIndex + 3:len(l) - 3])
+
+            # if
+
             self.circuitData.append((gate, gatePos))
             # print(gate, gatePos)
         return self.circuitData
