@@ -107,7 +107,8 @@ class CircuitListToMatrix:
                             layerMat = self.toGateMatrix(g)
                             continue
                         layerMat = np.kron(layerMat, self.toGateMatrix(g))
-                print(layerMat)
+                if not self.check:
+                    print(layerMat)
 
                 if self.check:
                     check = self.is_unitary(layerMat)

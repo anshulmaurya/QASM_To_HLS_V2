@@ -63,13 +63,14 @@ gc.s(2)
 gc.x(0)
 gc.z(0)
 gc.t(1)
+gc.t(2)
 print(gc)
 
 qasm = QASMProcessing(gc)
 cirData = qasm.qasmToList()
 print(cirData, len(cirData))
 
-cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)#, check=True)
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=True)
 matrix = cirMat.genMat
 
 print(matrix)
