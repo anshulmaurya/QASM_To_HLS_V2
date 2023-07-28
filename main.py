@@ -1,4 +1,5 @@
 from qiskit import QuantumCircuit
+from qiskit.circuit.random import random_circuit
 from QASM_Processing import QASMProcessing
 from MatrixGeneration import CircuitListToMatrix
 
@@ -51,18 +52,24 @@ def diffuser(cir, n):
 
 
 gc = QuantumCircuit(3)
-gc = init(gc, 3)
-gc = oracle(gc, 3)
-gc = diffuser(gc, 3)
-gc = oracle(gc, 3)
-gc = diffuser(gc, 3)
+# gc = init(gc, 3)
+# gc = oracle(gc, 3)
+# gc = diffuser(gc, 3)
+# gc = oracle(gc, 3)
+# gc = diffuser(gc, 3)
+
+gc.x(0)
+gc.s(2)
+gc.x(0)
+gc.z(0)
+gc.t(1)
 print(gc)
 
 qasm = QASMProcessing(gc)
 cirData = qasm.qasmToList()
 print(cirData, len(cirData))
 
-cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)  # , check=True)
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits)#, check=True)
 matrix = cirMat.genMat
 
 print(matrix)
@@ -77,7 +84,6 @@ print(matrix)
 
 # circuit already defined
 # from qiskit import*
-# from qiskit.circuit.random import random_circuit
 #
 # gc = random_circuit(2, 2)
 # backend = Aer.get_backend('unitary_simulator')

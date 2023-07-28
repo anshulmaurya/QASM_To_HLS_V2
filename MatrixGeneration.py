@@ -2,7 +2,7 @@ import numpy as np
 
 
 class CircuitListToMatrix:
-    def __init__(self, cirList, number_of_qubit, check = False):
+    def __init__(self, cirList, number_of_qubit, check=False):
         if len(cirList) == 0:
             raise Exception("empty list cant find circuit data")
         self.cirList = cirList
@@ -19,6 +19,15 @@ class CircuitListToMatrix:
         elif gateName == 'x':
             return np.matrix('0 1;'
                              '1 0')
+        elif gateName == 'z':
+            return np.matrix('1 0; '
+                             '0 -1')
+        elif gateName == 's':
+            return np.matrix('1 0; '
+                             '0 1j')
+        elif gateName == 't':
+            return np.matrix([[1, 0],
+                              [0, (np.cos(45) + (np.sin(45) * 1j))]])  # pi/4
 
     def cnotLayerMat(self, cnotDetail):
         import itertools
@@ -27,7 +36,7 @@ class CircuitListToMatrix:
             if x != 'I':
                 tempCnotDetail.append(x)
         cnotDetail = tempCnotDetail
-        del(tempCnotDetail)
+        del (tempCnotDetail)
         ctrl = cnotDetail[:len(cnotDetail) - 1]
         # ctrl.reverse()
         target = cnotDetail[len(cnotDetail) - 1]
@@ -116,6 +125,4 @@ class CircuitListToMatrix:
 
     @staticmethod
     def is_unitary(m):
-        # m = np.around(m, 1)
         return np.allclose(np.eye(m.shape[0]), np.around(m.H * m, 2))
-
