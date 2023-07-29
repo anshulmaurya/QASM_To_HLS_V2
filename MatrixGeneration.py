@@ -28,6 +28,9 @@ class CircuitListToMatrix:
         elif gateName == 't':
             return np.matrix([[1, 0],
                               [0, (np.cos(45) + (np.sin(45) * 1j))]])  # pi/4
+        elif gateName == 'sx':
+            return np.matrix([[1+1j, 1-1j],
+                              [1-1j, 1+1j]])
 
     def cnotLayerMat(self, cnotDetail):
         import itertools

@@ -59,7 +59,7 @@ gc = QuantumCircuit(3)
 # gc = diffuser(gc, 3)
 
 gc.x(0)
-gc.s(2)
+gc.sx(2)
 gc.x(0)
 gc.z(0)
 gc.t(1)
