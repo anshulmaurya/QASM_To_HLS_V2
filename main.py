@@ -1,5 +1,5 @@
-from qiskit import QuantumCircuit
 from qiskit.circuit.random import random_circuit
+from qiskit import QuantumCircuit
 from QASM_Processing import QASMProcessing
 from MatrixGeneration import CircuitListToMatrix
 
@@ -19,18 +19,6 @@ def oracle(cir, n):
     cir.mct([0, 1], 2)
     cir.h(2)
     cir.x(1)
-    # cir.x(0)
-    # cir.barrier([0, 1, 2])
-
-    # # 100
-    # cir.x(0)
-    # cir.x(1)
-    # cir.h(2)
-    # cir.mct([0, 1], 2)
-    # cir.h(2)
-    # cir.x(1)
-    # cir.x(0)
-    # cir.barrier([0, 1, 2])
     return cir
 
 
