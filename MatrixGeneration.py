@@ -1,5 +1,5 @@
 import numpy as np
-
+import os
 
 class CircuitListToMatrix:
     def __init__(self, cirList, number_of_qubit, check=False):
@@ -74,6 +74,12 @@ class CircuitListToMatrix:
 
     @property
     def genMat(self):
+        try:
+            os.remove("./Circuit_Matrix.txt")
+        except:
+            pass
+        f = open("Circuit_Matrix.txt", "a")
+
         if self.check:
             cirMat = np.identity(2 ** self.number_of_qubit)
         # layerMat = np.matrix(self.toGateMatrix(self.cirList[0]))
@@ -112,6 +118,15 @@ class CircuitListToMatrix:
                         layerMat = np.kron(layerMat, self.toGateMatrix(g))
                 if not self.check:
                     print(layerMat)
+                    s = "{\n"
+                    for r in layerMat:
+                        for e in str(r):
+                            if str(e) == "[" or str(e) == "]":
+                                continue
+                            s = s+str(e);
+                        s += "\n"
+                    s += "}\n\n\n\n"
+                    f.write(s)
 
                 if self.check:
                     check = self.is_unitary(layerMat)
@@ -119,6 +134,7 @@ class CircuitListToMatrix:
                     print(layerMat)
                     cirMat = np.matmul(np.around(cirMat, 3), np.around(layerMat, 3))
                 pair = []
+        f.close()
         if self.check:
             check = self.is_unitary(layerMat)
             print("\nIs Unitary: ", check)

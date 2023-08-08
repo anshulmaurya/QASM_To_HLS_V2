@@ -10,7 +10,6 @@ def init(cir, n):
         cir.barrier(p)
     return cir
 
-
 def oracle(cir, n):
     # 001
     # cir.x(0)
@@ -20,7 +19,6 @@ def oracle(cir, n):
     cir.h(2)
     cir.x(1)
     return cir
-
 
 def diffuser(cir, n):
     for p in range(n):
@@ -58,7 +56,7 @@ qasm = QASMProcessing(gc)
 cirData = qasm.qasmToList()
 print(cirData, len(cirData))
 
-cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=True)
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=False)
 matrix = cirMat.genMat
 
 print(matrix)
