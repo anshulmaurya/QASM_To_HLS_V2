@@ -3,11 +3,13 @@
 from typing import List, Any
 from qiskit import QuantumCircuit
 import math as m
-
+from qiskit import transpile
 
 class QASMProcessing:
-    def __init__(self, quantumCircuit):
+    def __init__(self, quantumCircuit, transpiler = False):
         if "qiskit.circuit." in str(type(quantumCircuit)):
+            if transpiler:
+                quantumCircuit = transpile(quantumCircuit, basis_gates=['u', 'cx', 'ccx', 'sx', 't', 'x', 'h', 'z'])
             qASM = quantumCircuit.qasm()
             file1 = open('./QASM.txt', 'w+')
             file1.writelines(qASM)
@@ -19,7 +21,13 @@ class QASMProcessing:
             self.circuitData = []
             self.QV = quantumCircuit.depth() * quantumCircuit.num_qubits
         else:
-            raise Exception("invalid circuit object", quantumCircuit)
+            file1 = open(quantumCircuit, 'r')
+            self.Lines = file1.readlines()
+            file1.close()
+            for l in self.Lines:
+                if "qreg" in l:
+                    self.numberOfQubits = int(l[-4], 10)
+            self.circuitData = []
 
     def stringProcessing(self):
         count = 0

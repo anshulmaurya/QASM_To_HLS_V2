@@ -1,58 +1,89 @@
-from qiskit.circuit.random import random_circuit
-from qiskit import QuantumCircuit
-from QASM_Processing import QASMProcessing
+import math
+
+# importing Qiskit
+from qiskit import QuantumCircuit, transpile
+
 from MatrixGeneration import CircuitListToMatrix
+from QASM_Processing import QASMProcessing
+
+EncodingAmplitudeAccuracy = 1
 
 
-def init(cir, n):
-    for p in range(n):
-        cir.h(p)
-        cir.barrier(p)
-    return cir
+def oracle(oracleCir, numQubits, winState):
+    qubitList = [x for x in range(numQubits)]
+    m = math.floor(
+        3.14 * EncodingAmplitudeAccuracy / (4 * (math.asin(math.sqrt(len(winState) / math.pow(2, len(qubitList)))))))
+    print("Circuit Repetetion = ", m)
+    if m == 0:
+        raise Exception("circuit not possible")
+    # final_oracleCir = QuantumCircuit(len(qubitList))
+    # oracleCir = QuantumCircuit(len(qubitList))
+    for n in range(numQubits):
+        oracleCir.h(n)
+    exeCount = 0
+    for ws in winState:
+        exeCount += 1
+        if len(ws) != len(qubitList):
+            raise Exception("invalid state with respect to the number of qubits")
+        # if exeCount > 1:
+        qPos = 0
+        for bit in ws:
+            if bit == '0':
+                oracleCir.x(len(qubitList) - 1 - qPos)
+            qPos += 1
+        oracleCir.h(len(qubitList) - 1)
+        nq = len(qubitList)
+        oracleCir.mct(list(range(nq - 1)), nq - 1)  # multi-controlled-toffoli
+        oracleCir.h(len(qubitList) - 1)
+        qPos = 0
+        for bit in ws:
+            if bit == '0':
+                oracleCir.x(len(qubitList) - 1 - qPos)
+            qPos += 1
 
-def oracle(cir, n):
-    # 001
-    # cir.x(0)
-    cir.x(1)
-    cir.h(2)
-    cir.mct([0, 1], 2)
-    cir.h(2)
-    cir.x(1)
-    return cir
-
-def diffuser(cir, n):
-    for p in range(n):
-        cir.h(p)
-    for p in range(n):
-        cir.x(p)
-
-    cir.h(2)
-    cir.mct([x for x in range(n - 1)], n - 1)
-    cir.h(2)
-
-    for p in range(n):
-        cir.x(p)
-    for p in range(n):
-        cir.h(p)
-    return cir
+    return oracleCir
 
 
-gc = QuantumCircuit(3)
-# gc = init(gc, 3)
-# gc = oracle(gc, 3)
-# gc = diffuser(gc, 3)
-# gc = oracle(gc, 3)
-# gc = diffuser(gc, 3)
+# n-bit generelized diffuser from quiskit git
+def diffuser(qc, qubitList):
+    nqubits = qubitList
+    # qc = QuantumCircuit(nqubits)
+    # Apply transformation |s> -> |00..0> (H-gates)
+    for qubit in range(nqubits):
+        qc.h(qubit)
+    # Apply transformation |00..0> -> |11..1> (X-gates)
+    for qubit in range(nqubits):
+        qc.x(qubit)
+    # Do multi-controlled-Z gate
+    qc.h(nqubits - 1)
+    qc.mct(list(range(nqubits - 1)), nqubits - 1)  # multi-controlled-toffoli
+    qc.h(nqubits - 1)
+    # Apply transformation |11..1> -> |00..0>
+    for qubit in range(nqubits):
+        qc.x(qubit)
+    # Apply transformation |00..0> -> |s>
+    for qubit in range(nqubits):
+        qc.h(qubit)
+    return qc
 
-gc.x(0)
-gc.sx(2)
-gc.x(0)
-gc.z(0)
-gc.t(1)
-gc.t(2)
+
+n = 8
+gc = QuantumCircuit(n)
+gc = oracle(gc, n, ["10100111", "10100100", "11011110", "10100010", "10110100", "11110110", "11100111"])
+gc = diffuser(gc, n)
+
+# gc.x(0)
+# gc.sx(2)
+# gc.x(0)
+# gc.z(0)
+# gc.t(1)
+# gc.t(2)
 print(gc)
+print("Depth:=", gc.depth())
 
-qasm = QASMProcessing(gc)
+# qasm = QASMProcessing(gc, transpiler=True)
+qasm = QASMProcessing('./QASM.txt', transpiler=True)
+
 cirData = qasm.qasmToList()
 print(cirData, len(cirData))
 

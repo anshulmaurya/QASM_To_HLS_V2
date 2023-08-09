@@ -1,6 +1,7 @@
 import numpy as np
 import os
 
+
 class CircuitListToMatrix:
     def __init__(self, cirList, number_of_qubit, check=False):
         if len(cirList) == 0:
@@ -11,26 +12,28 @@ class CircuitListToMatrix:
 
     def toGateMatrix(self, gateName):
         if gateName == 'h':
-            return np.matrix('0.707 0.707;'
-                             '0.707 -0.707')
+            return np.matrix([[0.707 + 0.j, 0.707 + 0.j],
+                              [0.707 + 0.j, -0.707 + 0.j]])
         elif gateName == 'I':
-            return np.matrix('1 0; '
-                             '0 1')
+            return np.matrix([[1.0 + 0.j, 0. + 0.j],
+                              [0. + 0.j, 1.0 + 0.j]])
         elif gateName == 'x':
-            return np.matrix('0 1;'
-                             '1 0')
+            return np.matrix([[0.0 + 0.j, 1. + 0.j],
+                              [1. + 0.j, 0. + 0.j]])
         elif gateName == 'z':
-            return np.matrix('1 0; '
-                             '0 -1')
+            return np.matrix([[1.0 + 0.j, 0. + 0.j],
+                              [0. + 0.j, -1.0 + 0.j]])
         elif gateName == 's':
-            return np.matrix('1 0; '
-                             '0 1j')
+            return np.matrix([[1.0 + 0.j, 0. + 0.j],
+                              [0. + 0.j, 0.0 + 1.j]])
         elif gateName == 't':
             return np.matrix([[1, 0],
                               [0, (np.cos(45) + (np.sin(45) * 1j))]])  # pi/4
         elif gateName == 'sx':
-            return np.matrix([[1+1j, 1-1j],
-                              [1-1j, 1+1j]])
+            return np.matrix([[1 + 1j, 1 - 1j],
+                              [1 - 1j, 1 + 1j]])
+        elif gateName[0] == 'u':
+            print("U gate")
 
     def cnotLayerMat(self, cnotDetail):
         import itertools
@@ -44,7 +47,7 @@ class CircuitListToMatrix:
         # ctrl.reverse()
         target = cnotDetail[len(cnotDetail) - 1]
         sqs = [''.join(s) for s in list(itertools.product(*[['0', '1']] * self.number_of_qubit))]
-        CNOT_LayerArray = np.zeros((2 ** self.number_of_qubit, 2 ** self.number_of_qubit))
+        CNOT_LayerArray = np.zeros((2 ** self.number_of_qubit, 2 ** self.number_of_qubit), dtype=complex)
         for i, binSeq in enumerate(sqs):
             ctrlFlag = 0
             for c in ctrl:
@@ -66,9 +69,9 @@ class CircuitListToMatrix:
                             ch = '1'
                         s = s + ch
                 r = sqs.index(s)
-                CNOT_LayerArray[r][i] = 1
+                CNOT_LayerArray[r][i] = 1 + 0.j
             else:
-                CNOT_LayerArray[i][i] = 1
+                CNOT_LayerArray[i][i] = 1 + 0.j
         # print('cnotdetail:', CNOT_LayerArray)
         return CNOT_LayerArray
 
@@ -81,7 +84,7 @@ class CircuitListToMatrix:
         f = open("Circuit_Matrix.txt", "a")
 
         if self.check:
-            cirMat = np.identity(2 ** self.number_of_qubit)
+            cirMat = np.identity(2 ** self.number_of_qubit, dtype=complex)
         # layerMat = np.matrix(self.toGateMatrix(self.cirList[0]))
         layerMat = np.matrix([])
         pair = []
@@ -119,13 +122,23 @@ class CircuitListToMatrix:
                 if not self.check:
                     print(layerMat)
                     s = "{\n"
+                    spaceflag = True
                     for r in layerMat:
                         for e in str(r):
                             if str(e) == "[" or str(e) == "]":
                                 continue
-                            s = s+str(e);
+                            l = len(s)
+                            # if s[l-1] == " " and s[l-2] == ".":
+                            if e == " " and s[l-1] == ".":
+                                e = "0"
+                            if s[l - 1] == "i" or s[l - 2] == "i":
+                                e = ", "
+                            if 'j' in str(e):
+                                e = e.replace("j", "i")
+                            s = s + str(e)
                         s += "\n"
-                    s += "}\n\n\n\n"
+
+                    s += "};\n\n\n\n"
                     f.write(s)
 
                 if self.check:
