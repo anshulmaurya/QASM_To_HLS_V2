@@ -3,7 +3,7 @@ import os
 
 
 class CircuitListToMatrix:
-    def __init__(self, cirList, number_of_qubit, check=False):
+    def __init__(self, cirList, number_of_qubit, check=True):
         if len(cirList) == 0:
             raise Exception("empty list cant find circuit data")
         self.cirList = cirList
@@ -11,6 +11,7 @@ class CircuitListToMatrix:
         self.check = check
 
     def toGateMatrix(self, gateName):
+        gateName = gateName.replace("pi", "180")
         if gateName == 'h':
             return np.matrix([[0.707 + 0.j, 0.707 + 0.j],
                               [0.707 + 0.j, -0.707 + 0.j]])
@@ -32,8 +33,41 @@ class CircuitListToMatrix:
         elif gateName == 'sx':
             return np.matrix([[1 + 1j, 1 - 1j],
                               [1 - 1j, 1 + 1j]])
+        elif gateName[0] == 'r':
+            if gateName[1] == 'x':
+                theta = eval(gateName[3:len(gateName) - 1])
+                return np.matrix([[np.cos(theta / 2), -1j * np.sin(theta / 2)],
+                                  [-1j * np.sin(theta / 2), np.cos(theta / 2)]])
+            elif gateName[1] == 'y':
+                theta = eval(gateName[3:len(gateName) - 1])
+                return np.matrix([[np.cos(theta / 2) + 0j, -np.sin(theta / 2) + 0j],
+                                  [np.sin(theta / 2) + 0j, np.cos(theta / 2) + 0j]])
+            elif gateName[1] == 'z':
+                lam = eval(gateName[3:len(gateName) - 1]) / 2
+                return np.matrix([[np.exp(-1j * lam), 0],
+                                  [0, np.exp(1j * lam)]])
+
         elif gateName[0] == 'u':
-            print("U gate")
+            gateName = gateName[2:len(gateName) - 1]
+            theta = ""
+            phi = ""
+            lam = ""
+            comaFlag = 0
+            for ch in gateName:
+                if ch == ',':
+                    comaFlag += 1
+                    continue
+                if comaFlag == 0:
+                    theta = theta + ch
+                if comaFlag == 1:
+                    phi = phi + ch
+                if comaFlag == 2:
+                    lam = lam + ch
+            theta = eval(theta)
+            phi = eval(phi)
+            lam = eval(lam)
+            return np.matrix([[np.cos(theta / 2), -1 * np.exp(1j * lam) * np.sin(theta / 2)],
+                              [np.exp(1j * phi) * np.sin(theta / 2), np.exp(1j * (phi + lam)) * np.cos(theta / 2)]])
 
     def cnotLayerMat(self, cnotDetail):
         import itertools
@@ -42,7 +76,7 @@ class CircuitListToMatrix:
             if x != 'I':
                 tempCnotDetail.append(x)
         cnotDetail = tempCnotDetail
-        del (tempCnotDetail)
+        # del (tempCnotDetail)
         ctrl = cnotDetail[:len(cnotDetail) - 1]
         # ctrl.reverse()
         target = cnotDetail[len(cnotDetail) - 1]
@@ -90,6 +124,7 @@ class CircuitListToMatrix:
         pair = []
         cnotFlag = 0
         pairNum = 0
+        print("Max Layers/Matrices: ", len(self.cirList)/self.number_of_qubit)
         for num in range(len(self.cirList)):
             if 'cx' in self.cirList[num] or 'ccx' in self.cirList[num]:
                 cnotFlag = 1
@@ -129,7 +164,7 @@ class CircuitListToMatrix:
                                 continue
                             l = len(s)
                             # if s[l-1] == " " and s[l-2] == ".":
-                            if e == " " and s[l-1] == ".":
+                            if e == " " and s[l - 1] == ".":
                                 e = "0"
                             if s[l - 1] == "i" or s[l - 2] == "i":
                                 e = ", "
@@ -145,7 +180,9 @@ class CircuitListToMatrix:
                     check = self.is_unitary(layerMat)
                     print("Is Unitary: ", check)
                     print(layerMat)
-                    cirMat = np.matmul(np.around(cirMat, 3), np.around(layerMat, 3))
+                    cirMat = np.matmul(np.around(cirMat, 5), np.around(layerMat, 5))
+                    if not check:
+                        raise Exception("Non unitary Matrix")
                 pair = []
         f.close()
         if self.check:

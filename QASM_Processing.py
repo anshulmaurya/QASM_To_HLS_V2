@@ -1,16 +1,19 @@
 # this file takes the qiskit circuit object and processes the QASM and
 # provides circuit data in a list of tuples; (gateType, Pos)
-from typing import List, Any
-from qiskit import QuantumCircuit
 import math as m
+from typing import Any
+
 from qiskit import transpile
 
+
 class QASMProcessing:
-    def __init__(self, quantumCircuit, transpiler = False):
+    def __init__(self, quantumCircuit, transpiler=True):
         if "qiskit.circuit." in str(type(quantumCircuit)):
             if transpiler:
-                quantumCircuit = transpile(quantumCircuit, basis_gates=['u', 'cx', 'ccx', 'sx', 't', 'x', 'h', 'z'])
+                quantumCircuit = transpile(quantumCircuit, basis_gates=['u', 'id', 'cx', 'sx',
+                                                                        't', 'x', 'h', 'z', 'rx', 'ry', 'rz'])
             qASM = quantumCircuit.qasm()
+            print("Transpiled Circuit Depth: ", quantumCircuit.depth())
             file1 = open('./QASM.txt', 'w+')
             file1.writelines(qASM)
             file1.close()
@@ -42,8 +45,8 @@ class QASMProcessing:
             gate = l[:spcaeIndex]
             if gate == "ccx" or gate == "cx":
                 if gate == "cx":
-                    l = 'c' + l    # making cx gate as ccx (are same)
-                    print(l)
+                    l = 'c' + l  # making cx gate as ccx (are same)
+                    # print(l)
                 ccxGatePos = []
                 numStr = ''
                 flag = 0
@@ -61,19 +64,14 @@ class QASMProcessing:
             else:
                 gatePos = int(l[spcaeIndex + 3:len(l) - 3])
 
-            # if
-
             self.circuitData.append((gate, gatePos))
             # print(gate, gatePos)
         return self.circuitData
 
     def qasmToList(self):
         cirData: list[Any] = self.stringProcessing()
-        # cirData.reverse()
         print(cirData)
         finalList = []
-        # print(finalList)
-        curr = 0
         n = 0
         for x in cirData:
             if n % self.numberOfQubits == 0:

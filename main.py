@@ -1,8 +1,5 @@
 import math
-
-# importing Qiskit
-from qiskit import QuantumCircuit, transpile
-
+from qiskit.circuit.random import random_circuit
 from MatrixGeneration import CircuitListToMatrix
 from QASM_Processing import QASMProcessing
 
@@ -67,25 +64,23 @@ def diffuser(qc, qubitList):
     return qc
 
 
-n = 8
-gc = QuantumCircuit(n)
-gc = oracle(gc, n, ["10100111", "10100100", "11011110", "10100010", "10110100", "11110110", "11100111"])
-gc = diffuser(gc, n)
+################################################################################################################################################################################
+###############################################################################################################################################################################
+################################################################################################################################################################################
 
-# gc.x(0)
-# gc.sx(2)
-# gc.x(0)
-# gc.z(0)
-# gc.t(1)
-# gc.t(2)
+n = 5
+# gc = QuantumCircuit(n)
+# gc = oracle(gc, n, ["10100"])
+# gc = diffuser(gc, n)
+
+gc = random_circuit(n, 5)
+
 print(gc)
 print("Depth:=", gc.depth())
 
-# qasm = QASMProcessing(gc, transpiler=True)
-qasm = QASMProcessing('./QASM.txt', transpiler=True)
-
+qasm = QASMProcessing(gc)
+# qasm = QASMProcessing('./QASM.txt', transpiler=True)
 cirData = qasm.qasmToList()
-print(cirData, len(cirData))
 
 cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=False)
 matrix = cirMat.genMat
@@ -93,12 +88,13 @@ matrix = cirMat.genMat
 print(matrix)
 
 ## TESTING WITH KET 0
-# import numpy as np
-#
-# ipVec = np.zeros(2 ** 3)
-# ipVec[0] = 1
-#
-# print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
+import numpy as np
+
+ipVec = np.zeros(2 ** n)
+ipVec[0] = 1
+r = np.square(np.absolute(np.matmul(ipVec, matrix)))
+print("\n\nfinal result:\n")
+print(r)
 
 # circuit already defined
 # from qiskit import*
@@ -116,3 +112,4 @@ print(matrix)
 # ipVec[0] = 1
 #
 # print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
+
