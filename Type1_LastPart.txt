@@ -1,0 +1,44 @@
+//==============================================================================================================================
+//==============================================================================================================================
+
+// Final Computation:
+
+    // Matrices and statevector init are getting updated into buffers
+    for (int i = 0; i < constSize*constSize; i++) {
+    	ptr_a[i] = M4[i];//Mat
+
+    	if(i < constSize){
+    		ptr_b[i] = ptr_result[i];
+    	}
+    }
+
+    // Data will be migrated to kernel space
+    OCL_CHECK(err, err = q.enqueueMigrateMemObjects({currLayerMatrix, finalStateVector}, 0 /* 0 means from host*/));
+
+    // Launch the Kernel
+    OCL_CHECK(err, err = q.enqueueTask(krnl_vec_Mat_Mul));
+
+    // The result of the previous kernel execution will need to be retrieved in
+    // order to view the results. This call will transfer the data from FPGA to
+    // source_results vector
+    OCL_CHECK(err, q.enqueueMigrateMemObjects({finalStateVector}, CL_MIGRATE_MEM_OBJECT_HOST));
+
+    OCL_CHECK(err, q.finish());
+
+
+    // printing the result
+    std::cout<<std::endl<<std::endl<<"Final Statevector:"<<std::endl<<"[ ";
+    for (int i = 0; i < constSize; i++) {
+    	std::cout<<ptr_result[i]<<", ";
+    }
+    std::cout<<"]"<<std::endl<<std::endl<<std::endl;
+
+    OCL_CHECK(err, err = q.enqueueUnmapMemObject(currLayerMatrix, ptr_a));
+    OCL_CHECK(err, err = q.enqueueUnmapMemObject(initStateVector, ptr_b));
+    OCL_CHECK(err, err = q.enqueueUnmapMemObject(finalStateVector, ptr_result));
+    OCL_CHECK(err, err = q.finish());
+
+}
+
+
+

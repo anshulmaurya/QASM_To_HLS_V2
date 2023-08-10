@@ -73,7 +73,7 @@ n = 5
 # gc = oracle(gc, n, ["10100"])
 # gc = diffuser(gc, n)
 
-gc = random_circuit(n, 5)
+gc = random_circuit(n, 10)
 
 print(gc)
 print("Depth:=", gc.depth())

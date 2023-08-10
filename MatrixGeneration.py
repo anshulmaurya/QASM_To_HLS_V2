@@ -116,7 +116,10 @@ class CircuitListToMatrix:
         except:
             pass
         f = open("Circuit_Matrix.txt", "a")
-
+        f2 = open("Type1_UpperPart.txt", "r")
+        text = f2.read()
+        f2.close()
+        f.write(text)
         if self.check:
             cirMat = np.identity(2 ** self.number_of_qubit, dtype=complex)
         # layerMat = np.matrix(self.toGateMatrix(self.cirList[0]))
@@ -124,7 +127,7 @@ class CircuitListToMatrix:
         pair = []
         cnotFlag = 0
         pairNum = 0
-        print("Max Layers/Matrices: ", len(self.cirList)/self.number_of_qubit)
+        print("Max Layers/Matrices: ", len(self.cirList) / self.number_of_qubit)
         for num in range(len(self.cirList)):
             if 'cx' in self.cirList[num] or 'ccx' in self.cirList[num]:
                 cnotFlag = 1
@@ -156,23 +159,23 @@ class CircuitListToMatrix:
                         layerMat = np.kron(layerMat, self.toGateMatrix(g))
                 if not self.check:
                     print(layerMat)
-                    s = "{\n"
-                    spaceflag = True
+                    s = "complex_t M" + str(pairNum) + "[] = {\n"
                     for r in layerMat:
                         for e in str(r):
-                            if str(e) == "[" or str(e) == "]":
+                            if str(e) == "[" or str(e) == "]" or str(e) == " ":
                                 continue
                             l = len(s)
-                            # if s[l-1] == " " and s[l-2] == ".":
+                            if e == '+' or e == '-' and s[l-1] == ".":
+                                e = '0' + e
                             if e == " " and s[l - 1] == ".":
-                                e = "0"
+                                # e = "0"
+                                pass
                             if s[l - 1] == "i" or s[l - 2] == "i":
                                 e = ", "
                             if 'j' in str(e):
                                 e = e.replace("j", "i")
                             s = s + str(e)
                         s += "\n"
-
                     s += "};\n\n\n\n"
                     f.write(s)
 
@@ -184,6 +187,28 @@ class CircuitListToMatrix:
                     if not check:
                         raise Exception("Non unitary Matrix")
                 pair = []
+        # first computation block
+        f2 = open("Type1_MiddlePart.txt", 'r')
+        text = f2.read()
+        f2.close()
+        f.write(text)
+
+        # 2nd and afterwards
+        for rep in range(2, pairNum):
+            f2 = open("Type1_RepetitivePart.txt", 'r')
+            text = f2.read()
+            f2.close()
+            newStr = "M" + str(rep) + "[i];//Mat"
+            text = text.replace("M3[i];//Mat", newStr)
+            f.write(text)
+
+        # Last Part
+        f2 = open("Type1_LastPart.txt", 'r')
+        text = f2.read()
+        newStr = "M" + str(pairNum) + "[i];//Mat"
+        text = text.replace("M4[i];//Mat", newStr)
+        f2.close()
+        f.write(text)
         f.close()
         if self.check:
             check = self.is_unitary(layerMat)
