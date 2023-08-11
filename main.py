@@ -1,4 +1,6 @@
 import math
+
+from qiskit import QuantumCircuit
 from qiskit.circuit.random import random_circuit
 from MatrixGeneration import CircuitListToMatrix
 from QASM_Processing import QASMProcessing
@@ -68,8 +70,13 @@ def diffuser(qc, qubitList):
 ###############################################################################################################################################################################
 ################################################################################################################################################################################
 
-n = 10
+n = 6
 # gc = QuantumCircuit(n)
+# for x in range(n):
+#     gc.h(x)
+# for x in range(n):
+#     gc.z(x)
+# gc.cx(1,2)
 # gc = oracle(gc, n, ["10100"])
 # gc = diffuser(gc, n)
 
@@ -78,7 +85,7 @@ gc = random_circuit(n, 5)
 print(gc)
 print("Depth:=", gc.depth())
 
-qasm = QASMProcessing(gc)
+qasm = QASMProcessing(gc, transpiler=True)
 # qasm = QASMProcessing('./QASM.txt', transpiler=True)
 cirData = qasm.qasmToList()
 

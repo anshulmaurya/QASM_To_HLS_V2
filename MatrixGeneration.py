@@ -177,7 +177,7 @@ class CircuitListToMatrix:
                                 # e = "0"
                                 pass
                             if s[l - 1] == "i" or s[l - 2] == "i":
-                                e = ", "
+                                e = ", "+e
                             if 'j' in str(e):
                                 e = e.replace("j", "i")
                             s = s + str(e)

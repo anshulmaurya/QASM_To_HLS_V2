@@ -62,7 +62,10 @@ class QASMProcessing:
                         flag = 1
                 gatePos = ccxGatePos
             else:
-                gatePos = int(l[spcaeIndex + 3:len(l) - 3])
+                try:
+                    gatePos = int(l[spcaeIndex + 3:len(l) - 3])
+                except:
+                    raise Exception("Turn on the transpiler -- Non supported gate")
 
             self.circuitData.append((gate, gatePos))
             # print(gate, gatePos)
