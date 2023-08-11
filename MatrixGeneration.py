@@ -3,12 +3,13 @@ import os
 
 
 class CircuitListToMatrix:
-    def __init__(self, cirList, number_of_qubit, check=True):
+    def __init__(self, cirList, number_of_qubit, check=True, type=1):
         if len(cirList) == 0:
             raise Exception("empty list cant find circuit data")
         self.cirList = cirList
         self.number_of_qubit = number_of_qubit
         self.check = check
+        self.type = type
 
     def toGateMatrix(self, gateName):
         gateName = gateName.replace("pi", "180")
@@ -116,10 +117,13 @@ class CircuitListToMatrix:
         except:
             pass
         f = open("Circuit_Matrix.txt", "a")
-        f2 = open("Type1_UpperPart.txt", "r")
-        text = f2.read()
-        f2.close()
-        f.write(text)
+        # if self.type == 1:
+        #     f2 = open("Type1_UpperPart.txt", "r")
+        # if self.type == 2:
+        #     f2 = open("Type2_UpperPart.txt", "r")
+        # text = f2.read()
+        # f2.close()
+        # f.write(text)
         if self.check:
             cirMat = np.identity(2 ** self.number_of_qubit, dtype=complex)
         # layerMat = np.matrix(self.toGateMatrix(self.cirList[0]))
@@ -157,15 +161,17 @@ class CircuitListToMatrix:
                             layerMat = self.toGateMatrix(g)
                             continue
                         layerMat = np.kron(layerMat, self.toGateMatrix(g))
+                        layerMat= np.round(layerMat, 2)
                 if not self.check:
                     print(layerMat)
-                    s = "complex_t M" + str(pairNum) + "[] = {\n"
+                    # s = "complex_t M" + str(pairNum) + "[] = {\n"
+                    s = "{\n"
                     for r in layerMat:
                         for e in str(r):
-                            if str(e) == "[" or str(e) == "]" or str(e) == " ":
+                            if str(e) == "[" or str(e) == "]" or str(e) == " " or str(e) == "\n":
                                 continue
                             l = len(s)
-                            if e == '+' or e == '-' and s[l-1] == ".":
+                            if e == '+' or e == '-' and s[l - 1] == ".":
                                 e = '0' + e
                             if e == " " and s[l - 1] == ".":
                                 # e = "0"
@@ -176,7 +182,7 @@ class CircuitListToMatrix:
                                 e = e.replace("j", "i")
                             s = s + str(e)
                         s += "\n"
-                    s += "};\n\n\n\n"
+                    s += ",};\n\n\n\n"
                     f.write(s)
 
                 if self.check:
@@ -187,28 +193,63 @@ class CircuitListToMatrix:
                     if not check:
                         raise Exception("Non unitary Matrix")
                 pair = []
-        # first computation block
-        f2 = open("Type1_MiddlePart.txt", 'r')
-        text = f2.read()
-        f2.close()
-        f.write(text)
-
-        # 2nd and afterwards
-        for rep in range(2, pairNum):
-            f2 = open("Type1_RepetitivePart.txt", 'r')
-            text = f2.read()
-            f2.close()
-            newStr = "M" + str(rep) + "[i];//Mat"
-            text = text.replace("M3[i];//Mat", newStr)
-            f.write(text)
-
-        # Last Part
-        f2 = open("Type1_LastPart.txt", 'r')
-        text = f2.read()
-        newStr = "M" + str(pairNum) + "[i];//Mat"
-        text = text.replace("M4[i];//Mat", newStr)
-        f2.close()
-        f.write(text)
+        # # first computation block
+        # if self.type == 1:
+        #     f2 = open("Type1_MiddlePart.txt", 'r')
+        # if self.type == 2:
+        #     f2 = open("Type2_MiddlePart.txt", "r")
+        # text = f2.read()
+        # f2.close()
+        # f.write(text)
+        #
+        # # 2nd and afterwards
+        # if self.type == 1:
+        #     for rep in range(2, pairNum):
+        #         f2 = open("Type1_RepetitivePart.txt", 'r')
+        #         text = f2.read()
+        #         f2.close()
+        #         newStr = "M" + str(rep) + "[i];//Mat"
+        #         text = text.replace("M3[i];//Mat", newStr)
+        #         f.write(text)
+        #
+        # if self.type == 2:
+        #     for rep in range(5, pairNum, 4):
+        #         print(rep)
+        #         f2 = open("Type2_RepetitivePart.txt", 'r')
+        #         text = f2.read()
+        #         f2.close()
+        #         newStr = "M" + str(rep) + "[i];//Mat"
+        #         text = text.replace("M1[i];//Mat", newStr)
+        #         newStr = "M" + str(rep+1) + "[i];//Mat"
+        #         text = text.replace("M2[i];//Mat", newStr)
+        #         newStr = "M" + str(rep+2) + "[i];//Mat"
+        #         text = text.replace("M3[i];//Mat", newStr)
+        #         newStr = "M" + str(rep+3) + "[i];//Mat"
+        #         text = text.replace("M4[i];//Mat", newStr)
+        #         f.write(text)
+        #
+        #
+        # # Last Part
+        # if self.type == 1:
+        #     f2 = open("Type1_LastPart.txt", 'r')
+        #     text = f2.read()
+        #     newStr = "M" + str(pairNum) + "[i];//Mat"
+        #     text = text.replace("M4[i];//Mat", newStr)
+        #     f2.close()
+        #     f.write(text)
+        # if self.type == 2:
+        #     f2 = open("Type2_LastPart.txt", 'r')
+        #     text = f2.read()
+        #     f2.close()
+        #     newStr = "M" + str(pairNum) + "[i];//Mat"
+        #     text = text.replace("M1[i];//Mat", newStr)
+        #     newStr = "M" + str(pairNum+1) + "[i];//Mat"
+        #     text = text.replace("M2[i];//Mat", newStr)
+        #     newStr = "M" + str(pairNum+2) + "[i];//Mat"
+        #     text = text.replace("M3[i];//Mat", newStr)
+        #     newStr = "M" + str(pairNum+3) + "[i];//Mat"
+        #     text = text.replace("M4[i];//Mat", newStr)
+        #     f.write(text)
         f.close()
         if self.check:
             check = self.is_unitary(layerMat)

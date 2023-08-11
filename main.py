@@ -68,12 +68,12 @@ def diffuser(qc, qubitList):
 ###############################################################################################################################################################################
 ################################################################################################################################################################################
 
-n = 5
+n = 10
 # gc = QuantumCircuit(n)
 # gc = oracle(gc, n, ["10100"])
 # gc = diffuser(gc, n)
 
-gc = random_circuit(n, 10)
+gc = random_circuit(n, 5)
 
 print(gc)
 print("Depth:=", gc.depth())
@@ -82,7 +82,7 @@ qasm = QASMProcessing(gc)
 # qasm = QASMProcessing('./QASM.txt', transpiler=True)
 cirData = qasm.qasmToList()
 
-cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=False)
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=False, type=1)
 matrix = cirMat.genMat
 
 print(matrix)
@@ -112,4 +112,3 @@ print(r)
 # ipVec[0] = 1
 #
 # print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
-

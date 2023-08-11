@@ -1,0 +1,38 @@
+//===============================================================================================================================
+    // Matrices are getting updated into buffers
+    for (int i = 0; i < constSize*constSize; i++) {
+    	ptr_a[i] = M1[i];//Mat
+    	ptr_b[i] = M2[i];//Mat
+    	ptr_c[i] = M3[i];//Mat
+    	ptr_d[i] = M4[i];//Mat
+    	if(i < constSize){
+    		ptr_e[i] = ptr_result[i];
+    	}
+    }
+
+
+    // Data will be migrated to kernel space
+    OCL_CHECK(err, err = q.enqueueMigrateMemObjects({currLayerMatrix_1, currLayerMatrix_2, currLayerMatrix_3,
+    												currLayerMatrix_4, initStateVector}, 0 /* 0 means from host*/));
+    // Launch the Kernel
+    OCL_CHECK(err, err = q.enqueueTask(krnl_four_mat_vec_Mul));
+
+    // The result of the previous kernel execution will need to be retrieved in
+    // order to view the results. This call will transfer the data from FPGA to
+    // source_results
+    OCL_CHECK(err, q.enqueueMigrateMemObjects({finalStateVector}, CL_MIGRATE_MEM_OBJECT_HOST));
+    OCL_CHECK(err, q.finish());
+
+	#if printResult
+    // printing the result
+    std::cout<<std::endl<<std::endl<<"printing the results:"<<std::endl<<"[ ";
+    for (int i = 0; i < constSize; i++) {
+    	std::cout<<ptr_result[i]<<", ";
+    }
+    std::cout<<"]"<<std::endl<<std::endl<<std::endl;
+	#endif
+
+
+
+
+//===============================================================================================================================
