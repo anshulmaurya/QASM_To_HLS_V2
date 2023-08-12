@@ -43,7 +43,8 @@ class QASMProcessing:
             # code to extract gate type and1 position
             spcaeIndex = l.index(' ')
             gate = l[:spcaeIndex]
-            if gate == "ccx" or gate == "cx":
+            spcaeIndex = len(gate)
+            if gate == "ccx" or gate == "cx" or "cp" in gate:
                 if gate == "cx":
                     l = 'c' + l  # making cx gate as ccx (are same)
                     # print(l)
@@ -65,7 +66,8 @@ class QASMProcessing:
                 try:
                     gatePos = int(l[spcaeIndex + 3:len(l) - 3])
                 except:
-                    raise Exception("Turn on the transpiler -- Non supported gate")
+                    pass
+                    raise Exception("Turn on the transpiler -- Non supported gate", gate)
 
             self.circuitData.append((gate, gatePos))
             # print(gate, gatePos)

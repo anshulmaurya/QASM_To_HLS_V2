@@ -1,76 +1,21 @@
 import math
-
-from qiskit import QuantumCircuit
+import time
+from qiskit import QuantumCircuit, assemble
 from qiskit.circuit.random import random_circuit
+from qiskit_aer import Aer
+
+
+
 from MatrixGeneration import CircuitListToMatrix
 from QASM_Processing import QASMProcessing
 
 EncodingAmplitudeAccuracy = 1
 
 
-def oracle(oracleCir, numQubits, winState):
-    qubitList = [x for x in range(numQubits)]
-    m = math.floor(
-        3.14 * EncodingAmplitudeAccuracy / (4 * (math.asin(math.sqrt(len(winState) / math.pow(2, len(qubitList)))))))
-    print("Circuit Repetetion = ", m)
-    if m == 0:
-        raise Exception("circuit not possible")
-    # final_oracleCir = QuantumCircuit(len(qubitList))
-    # oracleCir = QuantumCircuit(len(qubitList))
-    for n in range(numQubits):
-        oracleCir.h(n)
-    exeCount = 0
-    for ws in winState:
-        exeCount += 1
-        if len(ws) != len(qubitList):
-            raise Exception("invalid state with respect to the number of qubits")
-        # if exeCount > 1:
-        qPos = 0
-        for bit in ws:
-            if bit == '0':
-                oracleCir.x(len(qubitList) - 1 - qPos)
-            qPos += 1
-        oracleCir.h(len(qubitList) - 1)
-        nq = len(qubitList)
-        oracleCir.mct(list(range(nq - 1)), nq - 1)  # multi-controlled-toffoli
-        oracleCir.h(len(qubitList) - 1)
-        qPos = 0
-        for bit in ws:
-            if bit == '0':
-                oracleCir.x(len(qubitList) - 1 - qPos)
-            qPos += 1
-
-    return oracleCir
-
-
-# n-bit generelized diffuser from quiskit git
-def diffuser(qc, qubitList):
-    nqubits = qubitList
-    # qc = QuantumCircuit(nqubits)
-    # Apply transformation |s> -> |00..0> (H-gates)
-    for qubit in range(nqubits):
-        qc.h(qubit)
-    # Apply transformation |00..0> -> |11..1> (X-gates)
-    for qubit in range(nqubits):
-        qc.x(qubit)
-    # Do multi-controlled-Z gate
-    qc.h(nqubits - 1)
-    qc.mct(list(range(nqubits - 1)), nqubits - 1)  # multi-controlled-toffoli
-    qc.h(nqubits - 1)
-    # Apply transformation |11..1> -> |00..0>
-    for qubit in range(nqubits):
-        qc.x(qubit)
-    # Apply transformation |00..0> -> |s>
-    for qubit in range(nqubits):
-        qc.h(qubit)
-    return qc
-
-
 ################################################################################################################################################################################
 ###############################################################################################################################################################################
 ################################################################################################################################################################################
 
-n = 6
 # gc = QuantumCircuit(n)
 # for x in range(n):
 #     gc.h(x)
@@ -80,9 +25,40 @@ n = 6
 # gc = oracle(gc, n, ["10100"])
 # gc = diffuser(gc, n)
 
-gc = random_circuit(n, 5)
 
+# pi = 180
+# def qft_rotations(circuit, n):
+#     """Performs qft on the first n qubits in circuit (without swaps)"""
+#     if n == 0:
+#         return circuit
+#     n -= 1
+#     circuit.h(n)
+#     for qubit in range(n):
+#         circuit.cp(pi/2**(n-qubit), qubit, n)
+#     # At the end of our function, we call the same function again on
+#     # the next qubits (we reduced n by one earlier in the function)
+#     qft_rotations(circuit, n)
+#
+# def swap_registers(circuit, n):
+#     for qubit in range(n//2):
+#         circuit.swap(qubit, n-qubit-1)
+#     return circuit
+#
+# def qft(circuit, n):
+#     """QFT on the first n qubits in circuit"""
+#     qft_rotations(circuit, n)
+#     swap_registers(circuit, n)
+#     return circuit
+
+n = 9
+gc  = QuantumCircuit(n)
+# qft(gc,n)
+
+# gc = random_circuit(9, 1)
+for x in range(n):
+    gc.h(x)
 print(gc)
+
 print("Depth:=", gc.depth())
 
 qasm = QASMProcessing(gc, transpiler=True)
@@ -95,13 +71,15 @@ matrix = cirMat.genMat
 print(matrix)
 
 ## TESTING WITH KET 0
-import numpy as np
+# import numpy as np
+#
+# ipVec = np.zeros(2 ** n)
+# ipVec[0] = 1
+# r = np.square(np.absolute(np.matmul(ipVec, matrix)))
+# print("\n\nfinal result:\n")
+# print(r)
 
-ipVec = np.zeros(2 ** n)
-ipVec[0] = 1
-r = np.square(np.absolute(np.matmul(ipVec, matrix)))
-print("\n\nfinal result:\n")
-print(r)
+
 
 # circuit already defined
 # from qiskit import*
