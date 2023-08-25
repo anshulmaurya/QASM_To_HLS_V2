@@ -38,13 +38,13 @@ class CircuitListToMatrix:
             pass
         elif gateName[0] == 'r':
             if gateName[1] == 'x':
-                theta = eval(gateName[3:len(gateName) - 1])
-                return np.matrix([[np.cos(theta / 2), -1j * np.sin(theta / 2)],
-                                  [-1j * np.sin(theta / 2), np.cos(theta / 2)]])
+                theta = eval(gateName[3:len(gateName) - 1]) / 2
+                return np.matrix([[np.cos(theta), -1j * np.sin(theta)],
+                                  [-1j * np.sin(theta), np.cos(theta)]])
             elif gateName[1] == 'y':
-                theta = eval(gateName[3:len(gateName) - 1])
-                return np.matrix([[np.cos(theta / 2) + 0j, -np.sin(theta / 2) + 0j],
-                                  [np.sin(theta / 2) + 0j, np.cos(theta / 2) + 0j]])
+                theta = eval(gateName[3:len(gateName) - 1]) / 2
+                return np.matrix([[np.cos(theta) + 0j, -np.sin(theta) + 0j],
+                                  [np.sin(theta) + 0j, np.cos(theta) + 0j]])
             elif gateName[1] == 'z':
                 lam = eval(gateName[3:len(gateName) - 1]) / 2
                 return np.matrix([[np.exp(-1j * lam), 0],
@@ -66,11 +66,11 @@ class CircuitListToMatrix:
                     phi = phi + ch
                 if comaFlag == 2:
                     lam = lam + ch
-            theta = eval(theta)
+            theta = eval(theta) / 2
             phi = eval(phi)
             lam = eval(lam)
-            return np.matrix([[np.cos(theta / 2), -1 * np.exp(1j * lam) * np.sin(theta / 2)],
-                              [np.exp(1j * phi) * np.sin(theta / 2), np.exp(1j * (phi + lam)) * np.cos(theta / 2)]])
+            return np.matrix([[np.cos(theta), -1 * np.exp(1j * lam) * np.sin(theta)],
+                              [np.exp(1j * phi) * np.sin(theta), np.exp(1j * (phi + lam)) * np.cos(theta)]])
 
     def cnotLayerMat(self, cnotDetail):
         import itertools
@@ -115,18 +115,20 @@ class CircuitListToMatrix:
     @property
     def genMat(self):
         try:
-            os.remove("./Circuit_Matrix.txt")
+            os.remove("./matrix.txt")
         except:
             pass
-        f = open("Circuit_Matrix.txt", "a")
+        f = open("matrix.txt", "a")
         if self.check:
             cirMat = np.identity(2 ** self.number_of_qubit, dtype=complex)
+            ipVec = np.zeros(2 ** self.number_of_qubit)
+            ipVec[0] = 1
         # layerMat = np.matrix(self.toGateMatrix(self.cirList[0]))
         layerMat = np.matrix([])
         pair = []
         cnotFlag = 0
         pairNum = 0
-        print("Max Layers/Matrices: ", len(self.cirList) / self.number_of_qubit)
+        # print("Max Layers/Matrices: ", len(self.cirList) / self.number_of_qubit)
         for num in range(len(self.cirList)):
             if 'cx' in self.cirList[num] or 'ccx' in self.cirList[num]:
                 cnotFlag = 1
@@ -156,8 +158,8 @@ class CircuitListToMatrix:
                             layerMat = self.toGateMatrix(g)
                             continue
                         layerMat = np.round(np.kron(layerMat, self.toGateMatrix(g)), 5)
-                        layerMat = layerMat.tolist()
-                        np.savetxt("file2.txt", layerMat)
+                        if not self.check:
+                            layerMat = layerMat.tolist()
                 if not self.check:
                     # print(layerMat)
                     s = "{\n"
@@ -169,17 +171,17 @@ class CircuitListToMatrix:
                                     continue
                                 if e == '+' or e == '-' and s[l - 1] == ".":
                                     e = '0' + e
-                                if e == " " and s[l - 1] == ".":
-                                    # e = "0"
-                                    pass
+                                # if e == " " and s[l - 1] == ".":
+                                #     # e = "0"
+                                #     pass
                                 if s[l - 1] == "i" or s[l - 2] == "i":
                                     e = ", " + e
-                                if 'j' in str(e):
-                                    e = e.replace("j", "i")
+                                if e == 'j':
+                                    e = 'i'
                                 s = s + str(e)
                             else:
                                 pass
-                        s += "\n"
+                        # s += "\n"
                     s += ",};\n\n\n\n"
                     f.write(s)
 
@@ -187,6 +189,9 @@ class CircuitListToMatrix:
                     check = self.is_unitary(layerMat)
                     print("Is Unitary: ", check)
                     print(layerMat)
+                    r = np.matmul(ipVec, layerMat)
+                    print("Output Statevector:\n", r)
+                    ipVec = r
                     cirMat = np.matmul(np.around(cirMat, 5), np.around(layerMat, 5))
                     if not check:
                         raise Exception("Non unitary Matrix")

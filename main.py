@@ -4,13 +4,10 @@ from qiskit import QuantumCircuit, assemble
 from qiskit.circuit.random import random_circuit
 from qiskit_aer import Aer
 
-
-
 from MatrixGeneration import CircuitListToMatrix
 from QASM_Processing import QASMProcessing
 
 EncodingAmplitudeAccuracy = 1
-
 
 ################################################################################################################################################################################
 ###############################################################################################################################################################################
@@ -50,35 +47,36 @@ EncodingAmplitudeAccuracy = 1
 #     swap_registers(circuit, n)
 #     return circuit
 
-n = 9
-gc  = QuantumCircuit(n)
+n = 7
+gc = QuantumCircuit(n)
 # qft(gc,n)
 
 # gc = random_circuit(9, 1)
-for x in range(n):
-    gc.h(x)
+for i in range(8):
+    for x in range(n):
+        gc.h(x)
 print(gc)
 
 print("Depth:=", gc.depth())
 
-qasm = QASMProcessing(gc, transpiler=True)
+qasm = QASMProcessing(gc, transpiler=False)
 # qasm = QASMProcessing('./QASM.txt', transpiler=True)
 cirData = qasm.qasmToList()
 
 cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=False, type=1)
 matrix = cirMat.genMat
 
-print(matrix)
+# print(matrix)
 
-## TESTING WITH KET 0
-# import numpy as np
-#
-# ipVec = np.zeros(2 ** n)
-# ipVec[0] = 1
+# TESTING WITH KET 0
+import numpy as np
+
+ipVec = np.zeros(2 ** n)
+ipVec[0] = 1
 # r = np.square(np.absolute(np.matmul(ipVec, matrix)))
-# print("\n\nfinal result:\n")
-# print(r)
-
+r = np.matmul(ipVec, matrix)
+print("\n\nfinal result:\n")
+print(r)
 
 
 # circuit already defined
