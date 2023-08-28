@@ -1,7 +1,6 @@
 import numpy as np
 import os
 
-
 class CircuitListToMatrix:
     def __init__(self, cirList, number_of_qubit, check=True, type=1):
         if len(cirList) == 0:
