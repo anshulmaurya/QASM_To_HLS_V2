@@ -13,48 +13,39 @@ EncodingAmplitudeAccuracy = 1
 ###############################################################################################################################################################################
 ################################################################################################################################################################################
 
-# gc = QuantumCircuit(n)
-# for x in range(n):
-#     gc.h(x)
-# for x in range(n):
-#     gc.z(x)
-# gc.cx(1,2)
-# gc = oracle(gc, n, ["10100"])
-# gc = diffuser(gc, n)
-
-
-# pi = 180
-# def qft_rotations(circuit, n):
-#     """Performs qft on the first n qubits in circuit (without swaps)"""
-#     if n == 0:
-#         return circuit
-#     n -= 1
-#     circuit.h(n)
-#     for qubit in range(n):
-#         circuit.cp(pi/2**(n-qubit), qubit, n)
-#     # At the end of our function, we call the same function again on
-#     # the next qubits (we reduced n by one earlier in the function)
-#     qft_rotations(circuit, n)
-#
-# def swap_registers(circuit, n):
-#     for qubit in range(n//2):
-#         circuit.swap(qubit, n-qubit-1)
-#     return circuit
-#
-# def qft(circuit, n):
-#     """QFT on the first n qubits in circuit"""
-#     qft_rotations(circuit, n)
-#     swap_registers(circuit, n)
-#     return circuit
-
-n = 7
+n = 3
 gc = QuantumCircuit(n)
-# qft(gc,n)
+for q in range(n):
+    gc.h(q)
+
+for q in range(n):
+    gc.x(q)
+
+gc.h(n-1)
+gc.mct([n for n in range(n-1)], n-1)
+gc.h(n-1)
+
+for q in range(n):
+    gc.x(q)
+
+for q in range(n):
+    gc.h(q)
+for q in range(n):
+    gc.x(q)
+gc.h(n-1)
+gc.mct([n for n in range(n-1)], n-1)
+gc.h(n-1)
+for q in range(n):
+    gc.x(q)
+for q in range(n):
+    gc.h(q)
 
 # gc = random_circuit(9, 1)
-for i in range(8):
-    for x in range(n):
-        gc.h(x)
+
+# for i in range(12):
+#     for x in range(n):
+#         gc.h(x)
+
 print(gc)
 
 print("Depth:=", gc.depth())
@@ -63,10 +54,10 @@ qasm = QASMProcessing(gc, transpiler=False)
 # qasm = QASMProcessing('./QASM.txt', transpiler=True)
 cirData = qasm.qasmToList()
 
-cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=False, type=1)
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=True, type=1)
 matrix = cirMat.genMat
 
-# print(matrix)
+print(matrix)
 
 # TESTING WITH KET 0
 import numpy as np

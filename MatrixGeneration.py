@@ -75,14 +75,15 @@ class CircuitListToMatrix:
     def cnotLayerMat(self, cnotDetail):
         import itertools
         tempCnotDetail = []
-        for x in cnotDetail:
+        for x in reversed(cnotDetail):
             if x != 'I':
                 tempCnotDetail.append(x)
         cnotDetail = tempCnotDetail
-        # del (tempCnotDetail)
+        del (tempCnotDetail)
         ctrl = cnotDetail[:len(cnotDetail) - 1]
         # ctrl.reverse()
         target = cnotDetail[len(cnotDetail) - 1]
+        print("ctrl: ", ctrl, target)
         sqs = [''.join(s) for s in list(itertools.product(*[['0', '1']] * self.number_of_qubit))]
         CNOT_LayerArray = np.zeros((2 ** self.number_of_qubit, 2 ** self.number_of_qubit), dtype=complex)
         for i, binSeq in enumerate(sqs):
@@ -157,7 +158,8 @@ class CircuitListToMatrix:
                         if pos == 0:
                             layerMat = self.toGateMatrix(g)
                             continue
-                        layerMat = np.round(np.kron(layerMat, self.toGateMatrix(g)), 5)
+                        layerMat = np.round(np.kron(self.toGateMatrix(g), layerMat), 3)
+                        # layerMat = np.kron(layerMat, self.toGateMatrix(g))
                         if not self.check:
                             layerMat = layerMat.tolist()
                 if not self.check:
@@ -170,18 +172,18 @@ class CircuitListToMatrix:
                                 if e == '.' and s[l - 1] == ".":
                                     continue
                                 if e == '+' or e == '-' and s[l - 1] == ".":
-                                    e = '0' + e
-                                # if e == " " and s[l - 1] == ".":
-                                #     # e = "0"
-                                #     pass
+                                    # e = '0' + e
+                                    pass
+                                if e == " " and s[l - 1] == ".":
+                                    e = "0"
                                 if s[l - 1] == "i" or s[l - 2] == "i":
                                     e = ", " + e
                                 if e == 'j':
                                     e = 'i'
                                 s = s + str(e)
-                            else:
-                                pass
-                        # s += "\n"
+                            # else:
+                            #     pass
+                        s += "\n"
                     s += ",};\n\n\n\n"
                     f.write(s)
 
