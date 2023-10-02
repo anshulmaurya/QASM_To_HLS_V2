@@ -3,7 +3,6 @@
 
 import math as m
 from typing import Any
-
 from qiskit import transpile
 
 
@@ -30,13 +29,18 @@ class QASMProcessing:
             file1.close()
             for l in self.Lines:
                 if "qreg" in l:
-                    self.numberOfQubits = int(l[-4], 10)
+                    Nqubit = ""
+                    for s in l[7:]:
+                        if s == "]":
+                            break
+                        Nqubit += s
+                    self.numberOfQubits = int(Nqubit, 10)
             self.circuitData = []
 
     def stringProcessing(self):
         count = 0
         for l in self.Lines:
-            if "OPENQASM" in l or "include" in l or "barrier" in l or "qreg" in l:
+            if "OPENQASM" in l or "include" in l or "barrier" in l or "qreg" in l or "creg" in l:
                 continue
             # counts loop iteration
             count += 1

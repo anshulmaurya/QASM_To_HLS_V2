@@ -19,6 +19,10 @@ gc = QuantumCircuit(n)
 for q in range(n):
     gc.h(q)
 
+gc.h(n-1)
+gc.mct([n for n in range(n-1)], n-1)
+gc.h(n-1)
+
 for q in range(n):
     gc.x(q)
 
@@ -26,8 +30,8 @@ gc.h(n-1)
 gc.mct([n for n in range(n-1)], n-1)
 gc.h(n-1)
 
-for q in range(n):
-    gc.x(q)
+# for q in range(n):
+#     gc.x(q)
 
 for q in range(n):
     gc.h(q)
@@ -41,21 +45,42 @@ for q in range(n):
 for q in range(n):
     gc.h(q)
 
-# gc = random_circuit(9, 1)
+## gc = random_circuit(9, 1)
 
-# for i in range(12):
+# for i in range(1):
+#     for x in range(n):
+#         gc.x(x)
+#
+# for i in range(6):
 #     for x in range(n):
 #         gc.h(x)
+#
+# for i in range(1):
+#     for x in range(n):
+#         gc.x(x)
 
-print(gc)
+# for i in range(2):
+#     for x in range(n):
+#         gc.x(x)
+#
+#     for x in range(n):
+#         gc.h(x)
+#
+#     for x in range(n):
+#         gc.z(x)
+#
+#     for x in range(n):
+#         gc.i(x)
 
-print("Depth:=", gc.depth())
+# print(gc)
+#
+# print("Depth:=", gc.depth())
 
-qasm = QASMProcessing(gc, transpiler=False)
-# qasm = QASMProcessing('./QASM.txt', transpiler=True)
+# qasm = QASMProcessing(gc, transpiler=False)
+qasm = QASMProcessing('./QASM.txt', transpiler=False)
 cirData = qasm.qasmToList()
 
-cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=True, type=1)
+cirMat = CircuitListToMatrix(cirData, qasm.cirQubits, check=False, type=1)
 matrix = cirMat.genMat
 
 print(matrix)
@@ -63,7 +88,7 @@ print(matrix)
 # TESTING WITH KET 0
 import numpy as np
 
-ipVec = np.zeros(2 ** n)
+ipVec = np.zeros(2 ** 5)
 ipVec[0] = 1
 # r = np.square(np.absolute(np.matmul(ipVec, matrix)))
 r = np.matmul(ipVec, matrix)
@@ -87,3 +112,10 @@ print(r)
 # ipVec[0] = 1
 #
 # print("\n\nfinal result:\n", np.matmul(ipVec, matrix))
+
+
+
+
+
+
+

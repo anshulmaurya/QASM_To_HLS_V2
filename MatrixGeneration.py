@@ -33,8 +33,9 @@ class CircuitListToMatrix:
         elif gateName == 'sx':
             return np.matrix([[1 + 1j, 1 - 1j],
                               [1 - 1j, 1 + 1j]])
-        elif gateName == 'cp':
-            pass
+        elif gateName == 'id':
+            return np.matrix([[1 + 0j, 0 + 0j],
+                              [0 + 0j, 1 + 0j]])
         elif gateName[0] == 'r':
             if gateName[1] == 'x':
                 theta = eval(gateName[3:len(gateName) - 1]) / 2
@@ -189,11 +190,12 @@ class CircuitListToMatrix:
                 if self.check:
                     check = self.is_unitary(layerMat)
                     print("Is Unitary: ", check)
-                    print(layerMat)
+                    print("\n*** Layer Matrix: \n", layerMat)
                     r = np.matmul(ipVec, layerMat)
                     print("Output Statevector:\n", r)
                     ipVec = r
                     cirMat = np.matmul(np.around(cirMat, 5), np.around(layerMat, 5))
+                    print("\n*** Circuit Matrix: \n", cirMat)
                     if not check:
                         raise Exception("Non unitary Matrix")
                 pair = []
