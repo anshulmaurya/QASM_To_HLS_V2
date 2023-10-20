@@ -1,6 +1,5 @@
 # this file takes the qiskit circuit object and processes the QASM and
 # provides circuit data in a list of tuples; (gateType, Pos)
-
 import math as m
 from typing import Any
 from qiskit import transpile
@@ -126,34 +125,3 @@ class QASMProcessing:
     def cirQubits(self):
         return self.numberOfQubits
 
-    # @property
-    # def listProcess(self):
-    #     cirData: list[Any] = self.stringProcessing()
-    #     lenCount = 0
-    #     for g in cirData:
-    #         if g[0] == "ccx":
-    #             lenCount += len(g[1])
-    #         else:
-    #             lenCount += 1
-    #
-    #     finalList = [[] for _ in range(lenCount + 1)]
-    #     curr = 0
-    #     n = 0
-    #     for info in cirData:
-    #         if n % self.numberOfQubits == 0:
-    #             curr = n
-    #         if info[0] != 'ccx':
-    #             # print(curr + int(info[1]))
-    #             finalList[curr + int(info[1])].append(info[0])
-    #         else:
-    #             # pass
-    #             for i in range(len(info[1])):
-    #                 if n % self.numberOfQubits == 0:
-    #                     curr = n
-    #                 if i == len(info[1]) - 1:
-    #                     finalList[curr + info[1][i]].append('cx')
-    #                 else:
-    #                     finalList[curr + info[1][i]].append('c')
-    #                     n += 1
-    #         n += 1
-    #     return finalList
