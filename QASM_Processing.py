@@ -7,7 +7,7 @@ from qiskit import transpile
 
 class QASMProcessing:
     def __init__(self, quantumCircuit, transpiler=True):
-        if "qiskit.circuit." in str(type(quantumCircuit)):
+        if "qiskit.circuit." in str(type(quantumCircuit)):   #checking if quantum circuit is passed or QASM file is passed
             if transpiler:
                 quantumCircuit = transpile(quantumCircuit, basis_gates=['u', 'id', 'cx', 'sx',
                                                                         't', 'x', 'h', 'z', 'rx', 'ry', 'rz'])
@@ -24,8 +24,9 @@ class QASMProcessing:
             self.QV = quantumCircuit.depth() * quantumCircuit.num_qubits
         else:
             file1 = open(quantumCircuit, 'r')
-            self.Lines = file1.readlines()
+            self.Lines = file1.readlines()  # reading the lines (each line is qasm instruction)
             file1.close()
+            # extracting nuber of qubits from QASM
             for l in self.Lines:
                 if "qreg" in l:
                     Nqubit = ""
@@ -39,12 +40,12 @@ class QASMProcessing:
     def stringProcessing(self):
         count = 0
         for l in self.Lines:
-            if "OPENQASM" in l or "include" in l or "barrier" in l or "qreg" in l or "creg" in l:
+            if "OPENQASM" in l or "include" in l or "barrier" in l or "qreg" in l or "creg" in l:  # check the lines without qasm instruction (continuing for qams header)
                 continue
             # counts loop iteration
             count += 1
 
-            # code to extract gate type and1 position
+            # code to extract gate type and position
             spcaeIndex = l.index(' ')
             gate = l[:spcaeIndex]
             spcaeIndex = len(gate)
@@ -78,6 +79,8 @@ class QASMProcessing:
         return self.circuitData
 
     def qasmToList(self):
+        # This function converts the processed information from the strinProcessing function to the sorted (wrt qubits) list of gate and and position.
+        # This is the function which creates the layers by appending any blank space as Identity gate 
         cirData: list[Any] = self.stringProcessing()
         print(cirData)
         finalList = []
