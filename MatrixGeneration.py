@@ -10,7 +10,7 @@ class CircuitListToMatrix:
         self.type = type
 
     def toGateMatrix(self, gateName):
-        gateName = gateName.replace("pi", "180")
+        gateName = gateName.replace("pi", "180") 
         if gateName == 'h':
             return np.matrix([[0.707 + 0.j, 0.707 + 0.j],
                               [0.707 + 0.j, -0.707 + 0.j]])
@@ -35,6 +35,7 @@ class CircuitListToMatrix:
         elif gateName == 'id':
             return np.matrix([[1 + 0j, 0 + 0j],
                               [0 + 0j, 1 + 0j]])
+        # Generating the rotation gate matrix
         elif gateName[0] == 'r':
             if gateName[1] == 'x':
                 theta = eval(gateName[3:len(gateName) - 1]) / 2
@@ -48,7 +49,7 @@ class CircuitListToMatrix:
                 lam = eval(gateName[3:len(gateName) - 1]) / 2
                 return np.matrix([[np.exp(-1j * lam), 0],
                                   [0, np.exp(1j * lam)]])
-
+        # generating universal gate matrix
         elif gateName[0] == 'u':
             gateName = gateName[2:len(gateName) - 1]
             theta = ""
@@ -70,7 +71,7 @@ class CircuitListToMatrix:
             lam = eval(lam)
             return np.matrix([[np.cos(theta), -1 * np.exp(1j * lam) * np.sin(theta)],
                               [np.exp(1j * phi) * np.sin(theta), np.exp(1j * (phi + lam)) * np.cos(theta)]])
-
+    # generating cnot gate matrix
     def cnotLayerMat(self, cnotDetail):
         import itertools
         tempCnotDetail = []
@@ -83,8 +84,9 @@ class CircuitListToMatrix:
         # ctrl.reverse()
         target = cnotDetail[len(cnotDetail) - 1]
         print("ctrl: ", ctrl, target)
-        sqs = [''.join(s) for s in list(itertools.product(*[['0', '1']] * self.number_of_qubit))]
+        sqs = [''.join(s) for s in list(itertools.product(*[['0', '1']] * self.number_of_qubit))]  # generating all binary sequences upto number of quibits
         CNOT_LayerArray = np.zeros((2 ** self.number_of_qubit, 2 ** self.number_of_qubit), dtype=complex)
+        # flipping the bit based on the applied CNOT gate position
         for i, binSeq in enumerate(sqs):
             ctrlFlag = 0
             for c in ctrl:
@@ -114,6 +116,7 @@ class CircuitListToMatrix:
 
     @property
     def genMat(self):
+        #this function uses above two class functions to generate matrix from processed qasm file to write layer matrices in a file.
         try:
             os.remove("./matrix.txt")
         except:
